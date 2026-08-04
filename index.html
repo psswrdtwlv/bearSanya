@@ -7,41 +7,37 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Саня">
-    <link rel="apple-touch-icon" href="bear-icon.png?v=2">
+    <!-- Файл 512x512 для домашнего экрана и превью -->
+    <link rel="apple-touch-icon" href="bear-icon-512.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a1a0a">
 
-    <!-- Open Graph / Telegram / WhatsApp preview -->
+    <!-- Open Graph / Telegram -->
     <meta property="og:title" content="Медвежонок Саня">
     <meta property="og:description" content="Весёлая игра про медвежонка, который собирает мёд!">
-    <meta property="og:image" content="https://psswrdtwlv.github.io/bearSanya/bear-icon.png?v=2">
+    <meta property="og:image" content="https://psswrdtwlv.github.io/bearSanya/bear-icon-512.png?v=3">
     <meta property="og:image:width" content="512">
     <meta property="og:image:height" content="512">
     <meta property="og:image:type" content="image/png">
     <meta property="og:url" content="https://psswrdtwlv.github.io/bearSanya/">
     <meta property="og:type" content="website">
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Медвежонок Саня">
     <meta name="twitter:description" content="Весёлая игра про медвежонка!">
-    <meta name="twitter:image" content="https://psswrdtwlv.github.io/bearSanya/bear-icon.png?v=2">
+    <meta name="twitter:image" content="https://psswrdtwlv.github.io/bearSanya/bear-icon-512.png?v=3">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
             width: 100%; height: 100%;
-            overflow: hidden;
-            background: #0a1a0a;
+            overflow: hidden; background: #0a1a0a;
             touch-action: manipulation;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            -webkit-tap-highlight-color: transparent; user-select: none;
         }
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         #gameContainer { position: relative; width: 100%; height: 100%; display: none; }
@@ -55,11 +51,9 @@
             font-size: 20px; color: #fff;
             text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
             font-weight: 600; z-index: 10; pointer-events: none;
-            letter-spacing: -0.3px;
         }
         #gameOver {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(20,20,25,0.9); backdrop-filter: blur(20px);
             color: #fff; padding: 30px 40px; border-radius: 24px;
             text-align: center; font-size: 26px;
@@ -74,7 +68,7 @@
             border-radius: 40px; font-weight: 700; font-size: 18px;
             color: #2d2d2d; cursor: pointer;
             box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-            transition: all 0.15s ease; letter-spacing: -0.2px;
+            transition: all 0.15s ease;
         }
         .btn:active { transform: scale(0.96); opacity: 0.9; }
         #splash1, #splash2 {
@@ -86,10 +80,9 @@
         #splash1 { background: #0d0d15; opacity: 1; transition: opacity 0.6s ease; }
         #splash1.hidden { opacity: 0; }
         #splash1 .logo {
-            font-size: 16px; font-weight: 500;
-            letter-spacing: 4px; color: rgba(255,255,255,0.75);
-            margin-bottom: 6px; animation: fadeInDown 0.8s ease;
-            text-transform: uppercase;
+            font-size: 16px; font-weight: 500; letter-spacing: 4px;
+            color: rgba(255,255,255,0.75); margin-bottom: 6px;
+            animation: fadeInDown 0.8s ease; text-transform: uppercase;
         }
         #splash1 .sub {
             font-size: 11px; color: rgba(255,255,255,0.4);
@@ -101,8 +94,7 @@
         #splash2 { background: #162816; opacity: 0; display: none; }
         #splash2.show { display: flex; opacity: 1; transition: opacity 0.6s ease; }
         #splash2 .title {
-            font-size: 44px; font-weight: 800; color: #ffe9a7;
-            letter-spacing: 1px;
+            font-size: 44px; font-weight: 800; color: #ffe9a7; letter-spacing: 1px;
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center; line-height: 1.15; padding: 0 20px;
             text-shadow: 0 2px 10px rgba(255,215,0,0.3);
@@ -125,7 +117,7 @@
 
 <script>
 (function() {
-    // Фиксация высоты для PWA
+    // принудительная высота
     function fixHeight() {
         document.documentElement.style.height = window.innerHeight + 'px';
         document.body.style.height = window.innerHeight + 'px';
@@ -148,9 +140,7 @@
                     splash2.style.display = 'none';
                     gameContainer.style.display = 'block';
                     fixHeight();
-                    requestAnimationFrame(() => {
-                        startGame();
-                    });
+                    requestAnimationFrame(startGame);
                 }, 600);
             }, 2200);
         }, 600);
@@ -162,14 +152,12 @@
     let cameraX = 0, worldSpeed = 4.8, MAX_SPEED = 8.5;
     let score = 0, lives = 3, gameActive = false;
     let animationFrame, invincible = false, invincibleTimer = 0;
-    let bearScreenX;
-    let lastTime = 0;
+    let bearScreenX, lastTime = 0;
     const BEAR_W = 70, BEAR_H = 80;
-    const GRAVITY = 0.9;
-    const BASE_JUMP = -16.5, SUPER_JUMP = -19.5;
-    let bear = { worldX: 0, worldY: 0, vy: 0, onGround: false, canDoubleJump: false, runFrame: 0, squash: 0 };
-    let platforms = [], objects = [], particles = [], bgMountains = [], bgTrees = [];
-    const GAPS = { small: [90,140], medium: [160,220], large: [250,320] };
+    const GRAVITY = 0.9, BASE_JUMP = -16.5, SUPER_JUMP = -19.5;
+    let bear = { worldX:0, worldY:0, vy:0, onGround:false, canDoubleJump:false, runFrame:0, squash:0 };
+    let platforms=[], objects=[], particles=[], bgMountains=[], bgTrees=[];
+    const GAPS = { small:[90,140], medium:[160,220], large:[250,320] };
 
     function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -177,13 +165,10 @@
         H = canvas.height = window.innerHeight * dpr;
         canvas.style.width = window.innerWidth + 'px';
         canvas.style.height = window.innerHeight + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
+        ctx.setTransform(dpr,0,0,dpr,0,0);
         const style = getComputedStyle(document.body);
         const bottomSafe = parseFloat(style.paddingBottom) || 0;
-        const extraBottomMargin = 50; // запас, чтобы земля не уходила под индикатор
-
-        groundLevel = window.innerHeight - 85 - bottomSafe - extraBottomMargin;
+        groundLevel = window.innerHeight - 85 - bottomSafe;
         bear.worldY = groundLevel - BEAR_H;
         bearScreenX = Math.min(60, window.innerWidth * 0.10);
     }
@@ -200,7 +185,7 @@
     }
     window.addEventListener('keydown', e => { if (e.code==='Space'||e.key===' ') { e.preventDefault(); jump(); } });
     canvas.addEventListener('touchstart', e => { e.preventDefault(); jump(); });
-    canvas.addEventListener('mousedown', e => { jump(); });
+    canvas.addEventListener('mousedown', e => jump());
 
     function generateWorld() {
         platforms=[]; objects=[]; particles=[]; bgMountains=[]; bgTrees=[];
@@ -227,8 +212,7 @@
 
     function update(delta) {
         if (!gameActive) return;
-        const steps = Math.min(Math.ceil(delta/(1000/120)), 5);
-        const step = delta/steps;
+        const steps = Math.min(Math.ceil(delta/(1000/120)),5), step = delta/steps;
         for (let s=0; s<steps; s++) {
             bear.vy += GRAVITY*(step/16.67);
             bear.worldY += bear.vy*(step/16.67);
@@ -285,29 +269,29 @@
         for (let i=0;i<15;i++) particles.push({ x:bear.worldX+BEAR_W/2, y:bear.worldY+BEAR_H/2, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.5)*6-2, life:1, decay:0.03, size:3+Math.random()*6, color:Math.random()<0.5?'#ff4444':'#ff8888', type:'sparkle' });
     }
 
-    function drawSpruce(x, baseY, size) {
-        ctx.save(); ctx.translate(x, baseY); ctx.scale(size, size);
-        ctx.fillStyle = '#2c1810'; ctx.fillRect(-5, 0, 10, 50);
-        ctx.fillStyle = '#1b4a1b';
-        ctx.beginPath(); ctx.moveTo(0, -60); ctx.lineTo(-22, -15); ctx.lineTo(22, -15); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(0, -42); ctx.lineTo(-26, 5); ctx.lineTo(26, 5); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(0, -25); ctx.lineTo(-20, 18); ctx.lineTo(20, 18); ctx.fill();
+    function drawSpruce(x,baseY,size) {
+        ctx.save(); ctx.translate(x,baseY); ctx.scale(size,size);
+        ctx.fillStyle='#2c1810'; ctx.fillRect(-5,0,10,50);
+        ctx.fillStyle='#1b4a1b';
+        ctx.beginPath(); ctx.moveTo(0,-60); ctx.lineTo(-22,-15); ctx.lineTo(22,-15); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0,-42); ctx.lineTo(-26,5); ctx.lineTo(26,5); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(0,-25); ctx.lineTo(-20,18); ctx.lineTo(20,18); ctx.fill();
         ctx.restore();
     }
 
     function draw() {
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
         const grad = ctx.createLinearGradient(0,0,0,window.innerHeight);
         grad.addColorStop(0,'#0a2a5e'); grad.addColorStop(0.35,'#3a6fb5'); grad.addColorStop(0.65,'#7ebce6'); grad.addColorStop(0.85,'#c1e1c1'); grad.addColorStop(1,'#5a8f3c');
-        ctx.fillStyle = grad; ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+        ctx.fillStyle=grad; ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
         const sunX=window.innerWidth*0.85, sunY=window.innerHeight*0.2;
         const sunGlow = ctx.createRadialGradient(sunX,sunY,10,sunX,sunY,180);
         sunGlow.addColorStop(0,'rgba(255,255,200,1)'); sunGlow.addColorStop(0.3,'rgba(255,255,200,0.6)'); sunGlow.addColorStop(0.7,'rgba(255,200,100,0.1)'); sunGlow.addColorStop(1,'rgba(255,200,100,0)');
-        ctx.fillStyle = sunGlow; ctx.beginPath(); ctx.arc(sunX,sunY,180,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fffde7'; ctx.beginPath(); ctx.arc(sunX,sunY,35,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=sunGlow; ctx.beginPath(); ctx.arc(sunX,sunY,180,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#fffde7'; ctx.beginPath(); ctx.arc(sunX,sunY,35,0,Math.PI*2); ctx.fill();
         bgMountains.forEach(m => { const x = (m.x-cameraX*0.1)%(window.innerWidth*2)-400; const mg = ctx.createLinearGradient(0,groundLevel-m.height,0,groundLevel+40); mg.addColorStop(0,'#5a7a4a'); mg.addColorStop(1,'#3a5a2a'); ctx.fillStyle=mg; ctx.beginPath(); ctx.moveTo(x-m.width/2,groundLevel+40); ctx.quadraticCurveTo(x,groundLevel-m.height,x+m.width/2,groundLevel+40); ctx.fill(); });
         bgTrees.forEach(t => { const x = (t.x-cameraX*0.3)%(window.innerWidth*2)-200; drawSpruce(x, groundLevel-20, t.size); });
-        particles.filter(p => p.type==='cloud').forEach(p => { ctx.fillStyle=`rgba(255,255,255,${p.alpha})`; ctx.beginPath(); const cx=p.x,cy=p.y,s=p.size; ctx.arc(cx,cy,s*0.55,0,Math.PI*2); ctx.arc(cx+s*0.4,cy-s*0.15,s*0.45,0,Math.PI*2); ctx.arc(cx+s*0.8,cy+s*0.05,s*0.5,0,Math.PI*2); ctx.arc(cx+s*0.3,cy-s*0.35,s*0.4,0,Math.PI*2); ctx.fill(); });
+        particles.filter(p=>p.type==='cloud').forEach(p => { ctx.fillStyle=`rgba(255,255,255,${p.alpha})`; ctx.beginPath(); const cx=p.x,cy=p.y,s=p.size; ctx.arc(cx,cy,s*0.55,0,Math.PI*2); ctx.arc(cx+s*0.4,cy-s*0.15,s*0.45,0,Math.PI*2); ctx.arc(cx+s*0.8,cy+s*0.05,s*0.5,0,Math.PI*2); ctx.arc(cx+s*0.3,cy-s*0.35,s*0.4,0,Math.PI*2); ctx.fill(); });
         platforms.forEach(p => { const dx=p.x-cameraX; ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(dx,p.y+28,p.w,6); const pg=ctx.createLinearGradient(0,p.y,0,p.y+28); pg.addColorStop(0,'#7d5a4a'); pg.addColorStop(0.5,'#5d3a2a'); pg.addColorStop(1,'#3e2317'); ctx.fillStyle=pg; ctx.fillRect(dx,p.y,p.w,p.h); ctx.strokeStyle='#2c1810'; ctx.lineWidth=1; ctx.strokeRect(dx,p.y,p.w,p.h); const gg=ctx.createLinearGradient(0,p.y-8,0,p.y); gg.addColorStop(0,'#81c784'); gg.addColorStop(0.5,'#4caf50'); gg.addColorStop(1,'#2e7d32'); ctx.fillStyle=gg; ctx.fillRect(dx,p.y-8,p.w,10); ctx.fillStyle='#1b5e20'; for (let i=0;i<p.w;i+=8){ const h=3+Math.sin(i*0.5)*2; ctx.fillRect(dx+i,p.y-8,3,h); } ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fillRect(dx,p.y-6,p.w,3); ctx.fillStyle='#2c1e14'; for (let i=0;i<p.w;i+=45){ ctx.fillRect(dx+i+10,p.y+4,8,5); ctx.fillStyle='#4a3020'; ctx.fillRect(dx+i+25,p.y+10,12,4); ctx.fillStyle='#2c1e14'; } });
         objects.forEach(obj => { if (obj.collected&&obj.sparkTimer<=0) return; const dx=obj.x-cameraX, dy=obj.y+Math.sin(obj.bobPhase)*5; ctx.save(); if(obj.collected){ ctx.globalAlpha=obj.sparkTimer; ctx.scale(1.5-obj.sparkTimer*0.5,1.5-obj.sparkTimer*0.5); } ctx.shadowColor='#ffd700'; ctx.shadowBlur=14; ctx.font='bold 36px "Segoe UI Emoji", "Apple Color Emoji"'; ctx.textAlign='center'; ctx.fillText('🍯',dx,dy); ctx.shadowBlur=0; ctx.restore(); });
         particles.filter(p=>p.type==='sparkle').forEach(p=>{ ctx.fillStyle=p.color; ctx.globalAlpha=p.life; ctx.beginPath(); ctx.arc(p.x-cameraX,p.y,p.size,0,Math.PI*2); ctx.fill(); });
