@@ -1,0 +1,15 @@
+{
+  "name": "Медвежонок Саня",
+  "short_name": "Саня",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1a0a",
+  "theme_color": "#0a1a0a",
+  "icons": [
+    {
+      "src": "bear-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
