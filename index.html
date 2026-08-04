@@ -42,7 +42,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* важно: добавляем нижний безопасный отступ */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         #gameContainer { position: relative; width: 100%; height: 100%; display: none; }
@@ -126,6 +125,15 @@
 
 <script>
 (function() {
+    // Принудительно устанавливаем высоту html и body, чтобы избежать проблем в PWA
+    function fixHeight() {
+        document.documentElement.style.height = window.innerHeight + 'px';
+        document.body.style.height = window.innerHeight + 'px';
+    }
+    window.addEventListener('resize', fixHeight);
+    window.addEventListener('orientationchange', () => setTimeout(fixHeight, 100));
+    fixHeight();
+
     const splash1 = document.getElementById('splash1');
     const splash2 = document.getElementById('splash2');
     const gameContainer = document.getElementById('gameContainer');
@@ -139,7 +147,11 @@
                 setTimeout(() => {
                     splash2.style.display = 'none';
                     gameContainer.style.display = 'block';
-                    startGame();
+                    fixHeight(); // ещё раз пересчитываем высоту
+                    // Даём время на перерисовку, потом запускаем игру
+                    requestAnimationFrame(() => {
+                        startGame();
+                    });
                 }, 600);
             }, 2200);
         }, 600);
@@ -168,15 +180,17 @@
         canvas.style.height = window.innerHeight + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        // Учитываем нижний безопасный отступ (Home Indicator), чтобы земля не уходила за него
+        // Получаем нижний безопасный отступ с запасом
         const style = getComputedStyle(document.body);
         const bottomSafe = parseFloat(style.paddingBottom) || 0;
+        // Добавляем дополнительный запас 50px, чтобы земля была точно выше индикатора
+        const extraBottomMargin = 50;
 
-        groundLevel = window.innerHeight - 85 - bottomSafe;
+        groundLevel = window.innerHeight - 85 - bottomSafe - extraBottomMargin;
         bear.worldY = groundLevel - BEAR_H;
         bearScreenX = Math.min(60, window.innerWidth * 0.10);
     }
-    window.addEventListener('resize', resize); resize();
+    window.addEventListener('resize', resize);
 
     function jump() {
         if (!gameActive) return;
